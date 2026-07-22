@@ -4,8 +4,10 @@ import todoRouter from "./routes/todo_router.js";
 
 const app = express();
 
+app.use(express.json());
+
 app.use("/api/todoItems", todoRouter);
-app.use("api/auth", authRouter);
+app.use("/api/auth", authRouter);
 
 const PORT = process.env.PORT || 3000;
 
