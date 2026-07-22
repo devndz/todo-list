@@ -1,11 +1,11 @@
 import express, { type Request, type Response } from 'express';
-import auth_router from "./api_routes/auth_router.js";
-import todo_router from "./api_routes/todo_router.js";
+import authRouter from "./routes/auth_router.js";
+import todoRouter from "./routes/todo_router.js";
 
 const app = express();
 
-app.use("/api/todo", todo_router);
-app.use("api/auth", auth_router);
+app.use("/api/todoItems", todoRouter);
+app.use("api/auth", authRouter);
 
 const PORT = process.env.PORT || 3000;
 
