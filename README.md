@@ -1,0 +1,2 @@
+Going with SQLite for the databse, because it's super lightweight and meets all the requirements for this project.
+Also wanted to try out the Prisma library that you guys mentioned you use cause it seemed quite interesting.
