@@ -12,16 +12,25 @@ datasource db {
   provider = "sqlite"
 }
 
-model TodoItem {
-  id            Int @id @default(autoincrement())
-  name          String
-  description   String?
-  ownerName     String
-}
+// If u ever forget
+// https://www.prisma.io/docs/orm/prisma-schema/data-model/relations
+
+// Also remember to flush db before adding any new non optional cols
 
 model User {
   id            Int @id @default(autoincrement())
   email         String @unique
   name          String @unique
   password      String @unique
+  todoItems     TodoItem[]
 }
+
+model TodoItem {
+  id            Int @id @default(autoincrement())
+  name          String
+  description   String?
+  ownerId       Int
+  owner         User @relation(fields: [ownerId], references: [id])
+}
+
+

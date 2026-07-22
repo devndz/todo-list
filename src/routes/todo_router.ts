@@ -16,7 +16,10 @@ router.get("/", async (req: Request, res: Response) => {
         return res.status(500).json({ error: "An unexpected error occurred." });
     }
     
+});
 
-})
+router.post("/create", async (req: Request, res: Response) => {
+
+});
 
 export default router;
