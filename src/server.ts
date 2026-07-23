@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express';
-import authRouter from "./routes/auth_router.js";
-import todoRouter from "./routes/todo_router.js";
+import authRouter from "./routes/authRouter.js";
+import todoRouter from "./routes/todoRouter.js";
 
 const app = express();
 
