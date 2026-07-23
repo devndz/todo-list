@@ -3,9 +3,12 @@ import jwt from "jsonwebtoken";
 import type {authenticatedRequest, jwtPayload} from "../types.js";
 import "dotenv/config";
 
+//Middle ware which authenticate the JWT tokens of any route it's attached to.
+//Routes authenticated byt this middleware will receive the custom request type authenticatedRequest, defiend in types.ts
+//Which adds a user field to req containing a user's id and username.
 export function tokenAuthenticator(req: authenticatedRequest, res: Response, next: NextFunction){
     const authHeader = req.get("authorization");
-    //Assuming user uses the standard bearer format
+    //Assuming user uses the standard bearer token format
     const authToken = authHeader?.split(" ")[1];
 
     if(!authToken){
@@ -33,7 +36,8 @@ export function tokenAuthenticator(req: authenticatedRequest, res: Response, nex
 
         next();
     
-    }catch(error: any){
-        res.status(401).json({ error: 'Token is invalid or has expired.' });
+    } catch(error: any){
+        console.error(error); 
+        return res.status(401).json({ error: 'Token is invalid or has expired.' });
     }
 }

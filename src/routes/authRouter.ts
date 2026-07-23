@@ -6,13 +6,13 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 import type { authUserRequestBody } from "../types.js";
 
-const router: Router = Router();
+const authRouter: Router = Router();
 
 //Helpful docs: 
 // https://www.prisma.io/docs/orm/reference/error-reference
 // https://www.prisma.io/docs/orm/reference/error-reference#error-codes
 
-router.post("/register", async (req: Request<{}, {}, authUserRequestBody>, res: Response) => {
+authRouter.post("/register", async (req: Request<{}, {}, authUserRequestBody>, res: Response) => {
     try{
         const {username, password} = req.body;
 
@@ -25,7 +25,7 @@ router.post("/register", async (req: Request<{}, {}, authUserRequestBody>, res: 
                 password: hashedPassword
             }
         })
-        res.status(201).json({message: `Created account for ${username} with id: ${newUser.id}`});
+        return res.status(201).json({message: `Created account for ${username} with id: ${newUser.id}`});
     } catch (error: any) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
 
@@ -39,12 +39,12 @@ router.post("/register", async (req: Request<{}, {}, authUserRequestBody>, res: 
         }
 
         console.error(error);   
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
     }
 } )
 
 //Cannot wait until the new query method from http gets added to express, for now gotta use a post non semantically
-router.post("/login", async (req: Request<{}, {}, authUserRequestBody>, res: Response) => {
+authRouter.post("/login", async (req: Request<{}, {}, authUserRequestBody>, res: Response) => {
     try{
         const {username, password} = req.body;
 
@@ -72,8 +72,8 @@ router.post("/login", async (req: Request<{}, {}, authUserRequestBody>, res: Res
 
     } catch (error: any){
         console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
     }
 })
 
-export default router;
+export default authRouter;

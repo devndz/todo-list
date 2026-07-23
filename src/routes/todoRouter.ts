@@ -5,9 +5,9 @@ import type { createTodoItemRequestBody, patchTodoItemRequestBody, authenticated
 import {tokenAuthenticator} from "../middlewares/tokenAuthenticator.js"
 import { Prisma } from "../generated/prisma/client.js";
 
-const router: Router = Router();
+const todoRouter: Router = Router();
 
-router.get("/", async (req: Request, res: Response) => {
+todoRouter.get("/", async (req: Request, res: Response) => {
 
     try{
         const todoItems: TodoItem[] = await prisma.todoItem.findMany();
@@ -19,8 +19,7 @@ router.get("/", async (req: Request, res: Response) => {
     }
 });
 
-
-router.post("/create", tokenAuthenticator, async (req: authenticatedRequest<{}, createTodoItemRequestBody>, res: Response) => {
+todoRouter.post("/", tokenAuthenticator, async (req: authenticatedRequest<{}, createTodoItemRequestBody>, res: Response) => {
 
     try{
         const {name, description} = req.body;
@@ -38,7 +37,7 @@ router.post("/create", tokenAuthenticator, async (req: authenticatedRequest<{}, 
                 }
         })
 
-        res.status(201).json(newTodoItem)
+        return res.status(201).json(newTodoItem)
 
     } catch(error: any){
         console.error("Failed to create todoItem:", error);
@@ -52,7 +51,7 @@ router.post("/create", tokenAuthenticator, async (req: authenticatedRequest<{}, 
     
 });
 
-router.delete("/:id", tokenAuthenticator, async (req: authenticatedRequest<{id: string}>, res: Response) => {
+todoRouter.delete("/:id", tokenAuthenticator, async (req: authenticatedRequest<{id: string}>, res: Response) => {
     const idToDelete: number = parseInt(req.params.id);
     const userInfo = req.user;
 
@@ -87,12 +86,53 @@ router.delete("/:id", tokenAuthenticator, async (req: authenticatedRequest<{id: 
         res.status(204)
 
     } catch(error: any){
+        console.error(error); 
         return res.status(500).json({ error: "Unexpected server error." });
     }
 });
 
-router.patch("/:id", tokenAuthenticator, async (req: authenticatedRequest<{id: string}, patchTodoItemRequestBody>, res: Response) => {
+todoRouter.patch("/:id", tokenAuthenticator, async (req: authenticatedRequest<{id: string}, patchTodoItemRequestBody>, res: Response) => {
+    const idToUpdate: number = parseInt(req.params.id);
+    const userInfo = req.user;
+    const updatedFields: patchTodoItemRequestBody = req.body;
 
+    if(Object.keys(updatedFields).length === 0){
+        return res.status(400).json({ error: 'Request body is empty.' });
+    }
+
+    if(Number.isNaN(idToUpdate)){
+        return res.status(400).json({ error: "Invalid ID requestsed, id must be a valid integer." });
+    }
+
+    if(typeof userInfo?.id !== "number"){
+        return res.status(401).json({ error: "Invalid authtoken payload." });
+    }
+
+    try{
+        const todoItemToUpdate = await prisma.todoItem.findUnique({
+            where: { id: idToUpdate }, 
+            select: { ownerId: true } 
+        });
+
+        if(!todoItemToUpdate){
+            return res.status(404).json({ error: `todoItem with id: ${idToUpdate} was not found.` });
+        }
+
+        if(todoItemToUpdate.ownerId !== userInfo.id){
+            return res.status(403).json({ error: "Forbidden: You do not own this todoItem." });
+        }
+
+        const updatedTodoItem = await prisma.todoItem.update({
+            where: {id: idToUpdate},
+            data: updatedFields
+        });
+
+        return res.status(200).json(updatedTodoItem);
+
+    } catch(error: any){
+        console.error(error); 
+        return res.status(500).json({ error: "Unexpected server error." });
+    }
 });
 
-export default router;
+export default todoRouter;
