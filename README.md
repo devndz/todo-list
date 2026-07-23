@@ -11,8 +11,12 @@ Any endpoint which has the tokenAuthenticator middleware attached will get a use
     expects user/frontend to pass in {username, password} as the request body
 
 ## CRUD todoItem
-### GET /api/todoItems
+### GET /api/todoItems?searchFilters
     Fetches all todoItems in db
+    If search filters are wanted, they must be passed as query parameters. Those query paramter must full strict naming convention and must be 1 or many of the following {name, ownerId, ownerUsername, category, isCompleted}
+        You can find todoItems with no category by passing some for of none to the catergory parameter.
+        For the name field if a name of the todoItems contains the passed in any sub string name, then that todoItems is included.
+    searchFilters has strict validation, if invalid query parameters are passed endpoint will return 400 and not default to all todoItems.
 
 ### POST /api/todoItems
     Create a new todoItem in the db
@@ -21,9 +25,10 @@ Any endpoint which has the tokenAuthenticator middleware attached will get a use
 ### DELETE /api/todoItems/:id
     Deletes a todoItem in the db if the request is made by the owner of the todoItem
 
-### UPDATE /api/todoItems/:id
+### PATCH /api/todoItems/:id
     Updates a todoItem in the db if the request is made by the owner of the todoItem
-
+    Expects users to pass at least one of the following in the request body 
+    {name, description, category, isCompleted}
 
 
 ### Side Note

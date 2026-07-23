@@ -1,29 +1,77 @@
 import { type Request, type Response, Router } from "express";
 import prisma from "../prisma_setup/prisma.js"
 import type { TodoItem } from "../generated/prisma/index.js";
-import type { createTodoItemRequestBody, patchTodoItemRequestBody, authenticatedRequest } from "../types.js";
+import type { createTodoItemRequestBody, patchTodoItemRequestBody, authenticatedRequest, searchFilters, userInfo } from "../types.js";
 import {tokenAuthenticator} from "../middlewares/tokenAuthenticator.js"
 import { Prisma } from "../generated/prisma/client.js";
 
 const todoRouter: Router = Router();
 
-todoRouter.get("/", async (req: Request<{}>, res: Response) => {
+function createTodoItemWhereClause(filters: searchFilters): Prisma.TodoItemWhereInput | string {
+
+    const whereClause: Prisma.TodoItemWhereInput = {};
+
+    if(filters.name){
+        whereClause.name = { contains: filters.name }
+    }
+
+    if(filters.category){
+        const categoryIsNone: boolean = filters.category.toLocaleLowerCase() === "none";
+        whereClause.category = categoryIsNone ? null : filters.category;
+    }
+
+    if(filters.ownerId){
+        const ownerId: number = parseInt(filters.ownerId, 10)
+        if(Number.isNaN(ownerId)){
+            return "Owner id is NAN";
+        }
+        whereClause.ownerId = ownerId;
+    }
+
+    if(filters.ownerUsername){
+        whereClause.owner = {
+            username: filters.ownerUsername
+        };
+    }
+
+    if(filters.isCompleted){
+        whereClause.isCompleted = filters.isCompleted.toLocaleLowerCase() === "true";
+    }
+
+    return whereClause;
+}
+
+                        // SearchFilters are the shape of req.query
+todoRouter.get("/", async (req: Request<{}, {}, {}, searchFilters>, res: Response) => {
 
     try{
-        const todoItems: TodoItem[] = await prisma.todoItem.findMany();
+        const whereClause = createTodoItemWhereClause(req.query);
+
+        if(typeof whereClause === "string"){
+            return res.status(400).json({ error: "Misformatted url query, ownerId must be a number." });
+        }
+
+        if(Object.keys(whereClause).length !== Object.keys(req.query).length){
+            return res.status(400).json({ error: "Unrecognized query parameters were present in the request."})
+        }
+
+        const todoItems: TodoItem[] = await prisma.todoItem.findMany({
+            where: whereClause,
+            //Show the user the oldest todos first, because it's probably what they want to finish first
+            orderBy: { createdAt: "desc" }
+        });
 
         return res.status(200).json({todoItems})
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch todoItems:", error);
         return res.status(500).json({ error: "An unexpected error occurred." });
     }
 });
 
 todoRouter.post("/", tokenAuthenticator, async (req: authenticatedRequest<{}, createTodoItemRequestBody>, res: Response) => {
-
     try{
         
-        const userInfo = req.user;
+        const userInfo: userInfo | undefined = req.user;
 
         if(typeof userInfo?.id !== "number"){
             return res.status(401).json({ error: "Invalid authtoken payload." });
@@ -38,7 +86,7 @@ todoRouter.post("/", tokenAuthenticator, async (req: authenticatedRequest<{}, cr
 
         return res.status(201).json(newTodoItem)
 
-    } catch(error: any){
+    } catch(error: unknown){
         console.error("Failed to create todoItem:", error);
 
         if (error instanceof Prisma.PrismaClientValidationError) {
@@ -51,7 +99,7 @@ todoRouter.post("/", tokenAuthenticator, async (req: authenticatedRequest<{}, cr
 });
 
 todoRouter.delete("/:id", tokenAuthenticator, async (req: authenticatedRequest<{id: string}>, res: Response) => {
-    const idToDelete: number = parseInt(req.params.id);
+    const idToDelete: number = parseInt(req.params.id, 10);
     const userInfo = req.user;
 
     if(Number.isNaN(idToDelete)){
@@ -84,14 +132,14 @@ todoRouter.delete("/:id", tokenAuthenticator, async (req: authenticatedRequest<{
 
         res.status(204)
 
-    } catch(error: any){
+    } catch(error: unknown){
         console.error(error); 
         return res.status(500).json({ error: "Unexpected server error." });
     }
 });
 
 todoRouter.patch("/:id", tokenAuthenticator, async (req: authenticatedRequest<{id: string}, patchTodoItemRequestBody>, res: Response) => {
-    const idToUpdate: number = parseInt(req.params.id);
+    const idToUpdate: number = parseInt(req.params.id, 10);
     const userInfo = req.user;
     const updatedFields: patchTodoItemRequestBody = req.body;
 
@@ -128,7 +176,7 @@ todoRouter.patch("/:id", tokenAuthenticator, async (req: authenticatedRequest<{i
 
         return res.status(200).json(updatedTodoItem);
 
-    } catch(error: any){
+    } catch(error: unknown){
         console.error(error); 
         return res.status(500).json({ error: "Unexpected server error." });
     }

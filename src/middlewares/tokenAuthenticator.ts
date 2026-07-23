@@ -1,6 +1,6 @@
 import type {Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import type {authenticatedRequest, jwtPayload} from "../types.js";
+import type {authenticatedRequest, userInfo} from "../types.js";
 import "dotenv/config";
 
 //Middle ware which authenticate the JWT tokens of any route it's attached to.
@@ -30,13 +30,13 @@ export function tokenAuthenticator(req: authenticatedRequest, res: Response, nex
             return res.status(401).json({ error: "Invalid authtoken payload." });
         }
 
-        const decodedJwtPayload: jwtPayload = decoded as jwtPayload;
+        const decodedJwtPayload: userInfo = decoded as userInfo;
 
         req.user = decodedJwtPayload;
 
         next();
     
-    } catch(error: any){
+    } catch(error: unknown){
         console.error(error); 
         return res.status(401).json({ error: 'Token is invalid or has expired.' });
     }

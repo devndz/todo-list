@@ -5,10 +5,10 @@ import { type Request} from "express";
 export type authenticatedRequest
     <Params = Record<string, string | number>, Body = unknown> 
         = Request<Params, {}, Body> & {
-    user?: jwtPayload;
+    user?: userInfo;
 };
 
-export type jwtPayload = {
+export type userInfo = {
     id: number,
     username: string
 }
@@ -35,6 +35,7 @@ export type patchTodoItemRequestBody = {
 export type searchFilters = {
     name?: string,
     ownerId?: string,
+    ownerUsername?: string,
     category?: string,
-    isCompleted?: boolean,
+    isCompleted?: string,
 }

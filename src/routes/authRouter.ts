@@ -26,7 +26,7 @@ authRouter.post("/register", async (req: Request<{}, {}, authUserRequestBody>, r
             }
         })
         return res.status(201).json({message: `Created account for ${username} with id: ${newUser.id}`});
-    } catch (error: any) {
+    } catch (error: unknown) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
 
             if (error.code === 'P2002') {
@@ -70,7 +70,7 @@ authRouter.post("/login", async (req: Request<{}, {}, authUserRequestBody>, res:
 
         return res.status(200).json({authToken});
 
-    } catch (error: any){
+    } catch (error: unknown){
         console.error(error);
         return res.status(500).json({ error: 'Internal server error' });
     }
