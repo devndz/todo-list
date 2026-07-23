@@ -20,10 +20,21 @@ export type authUserRequestBody = {
 
 export type createTodoItemRequestBody = {
     name: string,
-    description?: string
+    description?: string,
+    category?: string,
+    ownerId?: number //Id will not ever be passed with body but we will want to append it
 }
 
 export type patchTodoItemRequestBody = {
     name?: string,
     description?: string
+    category?: string,
+    isCompleted?: boolean
+}
+
+export type searchFilters = {
+    name?: string,
+    ownerId?: string,
+    category?: string,
+    isCompleted?: boolean,
 }

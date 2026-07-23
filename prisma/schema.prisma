@@ -30,6 +30,10 @@ model TodoItem {
   description   String?
   ownerId       Int
   owner         User @relation(fields: [ownerId], references: [id])
+  category      String?
+  isCompleted   Boolean @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 

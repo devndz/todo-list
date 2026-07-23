@@ -27,4 +27,4 @@ Any endpoint which has the tokenAuthenticator middleware attached will get a use
 
 
 ### Side Note
-    I know I didn't have to actually run a db, but I wanted to learn prisma anyways, cuz you guys mentioned you use it and I have used a similar ORM in Springboot. So I chose to run prisma on top of sqlite.
+    I know I didn't have to actually run a db, but I wanted to learn prisma anyways, because you guys mentioned you use it and I have used a similar ORM in Springboot. So I chose to run prisma on top of sqlite.

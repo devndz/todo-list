@@ -7,7 +7,7 @@ import { Prisma } from "../generated/prisma/client.js";
 
 const todoRouter: Router = Router();
 
-todoRouter.get("/", async (req: Request, res: Response) => {
+todoRouter.get("/", async (req: Request<{}>, res: Response) => {
 
     try{
         const todoItems: TodoItem[] = await prisma.todoItem.findMany();
@@ -22,19 +22,18 @@ todoRouter.get("/", async (req: Request, res: Response) => {
 todoRouter.post("/", tokenAuthenticator, async (req: authenticatedRequest<{}, createTodoItemRequestBody>, res: Response) => {
 
     try{
-        const {name, description} = req.body;
+        
         const userInfo = req.user;
 
         if(typeof userInfo?.id !== "number"){
             return res.status(401).json({ error: "Invalid authtoken payload." });
         }
 
+        const createTodoItemInfo: createTodoItemRequestBody = req.body;
+        createTodoItemInfo.ownerId = userInfo.id;
+
         const newTodoItem = await prisma.todoItem.create({
-            data: {
-                    name,
-                    description: description ?? null,
-                    ownerId: userInfo?.id
-                }
+            data: createTodoItemInfo
         })
 
         return res.status(201).json(newTodoItem)
