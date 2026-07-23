@@ -22,4 +22,12 @@ router.post("/create", async (req: Request, res: Response) => {
 
 });
 
+router.delete("/:id",  async (req: Request, res: Response) => {
+
+});
+
+router.patch("/:id",  async (req: Request, res: Response) => {
+
+});
+
 export default router;

@@ -18,13 +18,13 @@ router.post("/registerUser", async (req: Request, res: Response) => {
         const hashCycles = 11; 
         const hashedPassword = await bcrypt.hash(password, hashCycles);
 
-        const newTodoItem = await prisma.user.create({
+        const newUser = await prisma.user.create({
             data: {
                 username,
                 password: hashedPassword
             }
         })
-        res.status(201).json({message: `Created account for ${username} with id: ${newTodoItem.id}`});
+        res.status(201).json({message: `Created account for ${username} with id: ${newUser.id}`});
     } catch (error: any) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
 
