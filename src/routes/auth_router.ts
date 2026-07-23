@@ -4,6 +4,7 @@ import { Prisma } from "../generated/prisma/client.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import { type authUserRequestBody } from "../types.js";
 
 const router: Router = Router();
 
@@ -11,7 +12,7 @@ const router: Router = Router();
 // https://www.prisma.io/docs/orm/reference/error-reference
 // https://www.prisma.io/docs/orm/reference/error-reference#error-codes
 
-router.post("/registerUser", async (req: Request, res: Response) => {
+router.post("/registerUser", async (req: Request<{}, {}, authUserRequestBody>, res: Response) => {
     try{
         const {username, password} = req.body;
 
@@ -43,7 +44,7 @@ router.post("/registerUser", async (req: Request, res: Response) => {
 } )
 
 //Cannot wait until the new query method from http gets added to express, for now gotta use a post non semantically
-router.post("/login", async (req: Request, res: Response) => {
+router.post("/login", async (req: Request<{}, {}, authUserRequestBody>, res: Response) => {
     try{
         const {username, password} = req.body;
 

@@ -9,3 +9,12 @@ export type jwtPayload = {
     id: number,
     username: string
 }
+
+export type authUserRequestBody = {
+  username: string;
+  password: string;
+};
+
+export type createTodoRequestBody = {
+    
+}
