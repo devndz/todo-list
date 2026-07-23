@@ -20,3 +20,8 @@ export type createTodoItemRequestBody = {
     name: string,
     description?: string
 }
+
+export type patchTodoItemRequestBody = {
+    name?: string,
+    description?: string
+}

@@ -1,7 +1,7 @@
 import { type Request, type Response, Router } from "express";
 import prisma from "../prisma_setup/prisma.js"
 import type { TodoItem } from "../generated/prisma/index.js";
-import type { createTodoItemRequestBody, authenticatedRequest } from "../types.js";
+import type { createTodoItemRequestBody, patchTodoItemRequestBody, authenticatedRequest } from "../types.js";
 import {tokenAuthenticator} from "../middlewares/tokenAuthenticator.js"
 import { Prisma } from "../generated/prisma/client.js";
 
@@ -83,7 +83,7 @@ router.delete("/:id", tokenAuthenticator, async (req: authenticatedRequest<{id: 
                 id: idToDelete,
             }
         });
-        
+
         res.status(204)
 
     } catch(error: any){
@@ -91,7 +91,7 @@ router.delete("/:id", tokenAuthenticator, async (req: authenticatedRequest<{id: 
     }
 });
 
-router.patch("/:id",  async (req: Request, res: Response) => {
+router.patch("/:id", tokenAuthenticator, async (req: authenticatedRequest<{id: string}, patchTodoItemRequestBody>, res: Response) => {
 
 });
 
