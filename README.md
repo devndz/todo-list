@@ -1,34 +1,38 @@
-# Route/endpoint Documentation
-Any endpoint which has the tokenAuthenticator middleware attached will get a user field with user info in it's custom request type, under the "user" field. This data is used to verify if the user has permision to run the requested endpoint.
+# Route / Endpoint Documentation
+
+## Authorization Middleware
+Endpoints protected by the `tokenAuthenticator` middleware require a valid JWT. This middleware extracts the identity payload into a new "user" field, which contains the username and id of the user, on authenticatedRequest objects and passes an object with this type over to authenticated/protected endpoints. Endpoints/routes can acess the user data via "req.user" for verification. 
 
 ## Auth 
-### POST /api/auth/register
-    adds a new user to the user table 
-    expects user/frontend to pass in {username, password} as the request body
 
-### POST /api/auth/login
-    returns a JWT token if username and password are valid
-    expects user/frontend to pass in {username, password} as the request body
+### `POST /api/auth/register`
+*   **Description:** Adds a new user to the user table.
+*   **Request Body:** `{ "username": "...", "password": "..." }`
 
-## CRUD todoItem
-### GET /api/todoItems?searchFilters
-    Fetches all todoItems in db
-    If search filters are wanted, they must be passed as query parameters. Those query paramter must full strict naming convention and must be 1 or many of the following {name, ownerId, ownerUsername, category, isCompleted}
-        You can find todoItems with no category by passing some for of none to the catergory parameter.
-        For the name field if a name of the todoItems contains the passed in any sub string name, then that todoItems is included.
-    searchFilters has strict validation, if invalid query parameters are passed endpoint will return 400 and not default to all todoItems.
+### `POST /api/auth/login`
+*   **Description:** Authenticates a user and returns a JWT token if credentials are valid.
+*   **Request Body:** `{ "username": "...", "password": "..." }`
 
-### POST /api/todoItems
-    Create a new todoItem in the db
-    reuqires user/frontend to pass in {name, (and optionally) description} as the request body
+## Todo Items (CRUD)
 
-### DELETE /api/todoItems/:id
-    Deletes a todoItem in the db if the request is made by the owner of the todoItem
+### `GET /api/todoItems`
+*   **Description:** Fetches all todo items. Can be filtered using optional query parameters.
+*   **Allowed Query Parameters:** `name`, `ownerId`, `ownerUsername`, `category`, `isCompleted`.
+*   **API Design Notes:**
+    *   **Strict Validation:** Passing an unrecognized parameter (e.g., `?caterrgory=`) will return a `400 Bad Request` rather than defaulting to fetching all items.
+    *   **Exact Matching:** The `name` filter requires an exact match. 
+    *   **Null Categories:** Passing `"none"` to the `category` parameter will filter for items that do not have an assigned category.
 
-### PATCH /api/todoItems/:id
-    Updates a todoItem in the db if the request is made by the owner of the todoItem
-    Expects users to pass at least one of the following in the request body 
-    {name, description, category, isCompleted}
+### `POST /api/todoItems`
+*   **Description:** Creates a new todo item in the database.
+*   **Request Body:** `{ "name": "...", "description": "..." }` *(description is optional)*
+
+### `PATCH /api/todoItems/:id`
+*   **Description:** Updates an existing todo item. **Must be the owner** of the todo item to perform this action.
+*   **Request Body:** Expects at least one of the following fields: `{ "name": "...", "description": "...", "category": "...", "isCompleted": "..." }`.
+
+### `DELETE /api/todoItems/:id`
+*   **Description:** Deletes a todo item from the database. **Must be the owner** of the todo item to perform this action.
 
 
 ### Side Note
