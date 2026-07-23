@@ -133,7 +133,7 @@ todoRouter.delete("/:id", tokenAuthenticator, async (req: authenticatedRequest<{
         res.status(204)
 
     } catch(error: unknown){
-        console.error(error); 
+        console.error("Failed to delete todoItem:", error);
         return res.status(500).json({ error: "Unexpected server error." });
     }
 });
@@ -177,7 +177,7 @@ todoRouter.patch("/:id", tokenAuthenticator, async (req: authenticatedRequest<{i
         return res.status(200).json(updatedTodoItem);
 
     } catch(error: unknown){
-        console.error(error); 
+        console.error("Failed to patch todoItem:", error);
         return res.status(500).json({ error: "Unexpected server error." });
     }
 });

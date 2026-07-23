@@ -38,7 +38,7 @@ authRouter.post("/register", async (req: Request<{}, {}, authUserRequestBody>, r
             return res.status(400).json({ error: 'email, username or password were not provided.'});
         }
 
-        console.error(error);   
+        console.error("Failed to register user.", error);   
         return res.status(500).json({ error: 'Internal server error' });
     }
 } )
@@ -71,7 +71,7 @@ authRouter.post("/login", async (req: Request<{}, {}, authUserRequestBody>, res:
         return res.status(200).json({authToken});
 
     } catch (error: unknown){
-        console.error(error);
+        console.error("Failed to login user.", error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 })

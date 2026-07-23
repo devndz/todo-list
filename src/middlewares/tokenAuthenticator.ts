@@ -37,7 +37,7 @@ export function tokenAuthenticator(req: authenticatedRequest, res: Response, nex
         next();
     
     } catch(error: unknown){
-        console.error(error); 
+        console.error("Failled to authenticate token", error); 
         return res.status(401).json({ error: 'Token is invalid or has expired.' });
     }
 }
