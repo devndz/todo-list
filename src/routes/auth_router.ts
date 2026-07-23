@@ -4,7 +4,7 @@ import { Prisma } from "../generated/prisma/client.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
-import { type authUserRequestBody } from "../types.js";
+import type { authUserRequestBody } from "../types.js";
 
 const router: Router = Router();
 
@@ -12,7 +12,7 @@ const router: Router = Router();
 // https://www.prisma.io/docs/orm/reference/error-reference
 // https://www.prisma.io/docs/orm/reference/error-reference#error-codes
 
-router.post("/registerUser", async (req: Request<{}, {}, authUserRequestBody>, res: Response) => {
+router.post("/register", async (req: Request<{}, {}, authUserRequestBody>, res: Response) => {
     try{
         const {username, password} = req.body;
 

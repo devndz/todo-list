@@ -1,9 +1,10 @@
 import { type Request} from "express";
 
-export interface tokenAuthenticationRequest extends Request {
-    // user field always starts null and will be appeneded to req if authentication is successful 
-    user?: jwtPayload
-}
+//Need to maintain the genericness of the new request type 
+//so we can still define the shape of request body on already authenticated requets
+export type authenticatedRequest<Params = Record<string, string>, Body = unknown> = Request<Params, {}, Body> & {
+    user?: jwtPayload;
+};
 
 export type jwtPayload = {
     id: number,
@@ -15,6 +16,7 @@ export type authUserRequestBody = {
   password: string;
 };
 
-export type createTodoRequestBody = {
-    
+export type createTodoItemRequestBody = {
+    name: string,
+    description?: string
 }

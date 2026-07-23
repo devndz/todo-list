@@ -1,9 +1,9 @@
-import {type Response, type NextFunction } from "express";
+import type {Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import {type tokenAuthenticationRequest, type jwtPayload} from "../types.js";
+import type {authenticatedRequest, jwtPayload} from "../types.js";
 import "dotenv/config";
 
-export function tokenAuthenticator(req: tokenAuthenticationRequest, res: Response, next: NextFunction){
+export function tokenAuthenticator(req: authenticatedRequest, res: Response, next: NextFunction){
     const authHeader = req.get("authorization");
     //Assuming user uses the standard bearer format
     const authToken = authHeader?.split(" ")[1];
@@ -16,15 +16,15 @@ export function tokenAuthenticator(req: tokenAuthenticationRequest, res: Respons
         const decoded = jwt.verify(authToken, process.env.JWT_SECRET as string);
 
         if (typeof decoded === "string") {
-            return res.status(401).json({ error: "Invalid token payload." });
+            return res.status(401).json({ error: "Invalid authtoken payload." });
         }
 
         if (typeof decoded.id !== "number") {
-            return res.status(401).json({ error: "Invalid token payload." });
+            return res.status(401).json({ error: "Invalid authtoken payload." });
         }
 
         if (typeof decoded.username !== "string"){
-            return res.status(401).json({ error: "Invalid token payload." });
+            return res.status(401).json({ error: "Invalid authtoken payload." });
         }
 
         const decodedJwtPayload: jwtPayload = decoded as jwtPayload;
